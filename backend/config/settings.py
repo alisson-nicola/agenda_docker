@@ -31,6 +31,9 @@ INSTALLED_APPS = [
     # Apps de terceiros
     "rest_framework",
     "corsheaders",
+
+    # App local do projeto
+    "appointments",
 ]
 
 MIDDLEWARE = [
