@@ -1,0 +1,26 @@
+# =========================
+# Etapa 1: build do frontend
+# =========================
+FROM node:22-alpine AS builder
+
+WORKDIR /app
+
+# Copia package files primeiro para aproveitar cache
+COPY frontend/package*.json /app/
+
+# Instala dependências
+RUN npm install
+
+# Copia o restante do projeto
+COPY frontend /app
+
+# Gera build estático do React/Vite
+RUN npm run build
+
+# =========================
+# Etapa 2: imagem final com Nginx
+# =========================
+FROM nginx:1.27-alpine
+
+# Copia os arquivos buildados para a pasta padrão do Nginx
+COPY --from=builder /app/dist /usr/share/nginx/html
