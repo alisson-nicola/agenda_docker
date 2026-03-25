@@ -1,0 +1,53 @@
+services:
+  db:
+    # Imagem oficial do PostgreSQL (versão 16)
+    image: postgres:16
+
+    # Nome fixo do container (facilita debug e conexão externa)
+    container_name: agenda_docker_db
+
+    # Sempre reinicia, exceto se você parar manualmente
+    restart: unless-stopped
+
+    # Carrega variáveis do arquivo .env
+    env_file:
+      - .env
+
+    # Variáveis usadas pelo container do Postgres na inicialização
+    environment:
+      # Nome do banco que será criado automaticamente
+      POSTGRES_DB: ${POSTGRES_DB}
+
+      # Usuário do banco
+      POSTGRES_USER: ${POSTGRES_USER}
+
+      # Senha do banco
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+    ports:
+      # Expõe a porta do container para sua máquina local (Windows)
+      # Ex: você pode conectar via DBeaver em localhost:5432
+      - "${POSTGRES_PORT}:5432"
+
+    volumes:
+      # Volume persistente (MUITO IMPORTANTE)
+      # Evita perder dados ao recriar o container
+      - postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      # Verifica se o banco está pronto para uso
+      # Isso é essencial quando o Django depender dele
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+
+      # Intervalo entre verificações
+      interval: 10s
+
+      # Tempo máximo de espera por tentativa
+      timeout: 5s
+
+      # Quantas falhas antes de marcar como "unhealthy"
+      retries: 5
+
+# Definição do volume persistente
+volumes:
+  postgres_data:
