@@ -48,7 +48,6 @@ services:
       - "${DJANGO_PORT}:8000"
 
     volumes:
-      # Em desenvolvimento, montamos o código para refletir mudanças locais
       - ./backend:/app
 
     depends_on:
@@ -56,6 +55,23 @@ services:
         condition: service_healthy
 
     command: python manage.py runserver 0.0.0.0:8000
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend/Dockerfile
+    container_name: agenda_docker_frontend
+    restart: unless-stopped
+
+    ports:
+      - "${VITE_PORT}:5173"
+
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+    depends_on:
+      - backend
 
 volumes:
   postgres_data:
