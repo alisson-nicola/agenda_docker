@@ -1,0 +1,26 @@
+services:
+  db:
+    ports:
+      - "${POSTGRES_PORT}:5432"
+
+  backend:
+    ports:
+      - "${DJANGO_PORT}:8000"
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./backend:/app
+      - static_data:/app/staticfiles
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend/Dockerfile
+    ports:
+      - "${VITE_PORT}:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+  nginx:
+    depends_on:
+      - backend
